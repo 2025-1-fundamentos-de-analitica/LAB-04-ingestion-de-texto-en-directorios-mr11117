@@ -71,3 +71,38 @@ def pregunta_01():
 
 
     """
+import os
+import pandas as pd
+
+def pregunta_01():
+    base_dir = os.path.join("files", "input")
+    output_dir = os.path.join("files", "output")
+    os.makedirs(output_dir, exist_ok=True)
+
+    def load_dataset(split):
+        """
+        split: 'train' o 'test'
+        Retorna dataframe con columnas ['phrase', 'sentiment']
+        """
+        data = []
+        split_path = os.path.join(base_dir, split)
+        for sentiment in ['positive', 'negative', 'neutral']:
+            sentiment_path = os.path.join(split_path, sentiment)
+            if not os.path.exists(sentiment_path):
+                continue
+            for filename in os.listdir(sentiment_path):
+                if filename.endswith(".txt"):
+                    filepath = os.path.join(sentiment_path, filename)
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        phrase = f.read().strip()
+                    data.append({'phrase': phrase, 'target': sentiment})
+        return pd.DataFrame(data)
+
+    train_df = load_dataset("train")
+    test_df = load_dataset("test")
+
+    train_df.to_csv(os.path.join(output_dir, "train_dataset.csv"), index=False)
+    test_df.to_csv(os.path.join(output_dir, "test_dataset.csv"), index=False)
+
+# Ejecuta la función
+print(pregunta_01())
